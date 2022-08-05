@@ -1,25 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useState, useMemo, useEffect } from "react";
+import debouce from "lodash.debounce";
 
-function App() {
+const fruits = [
+  "apple",
+  "orange",
+  "banana",
+  "pear",
+  "grapefruit",
+  "peach",
+  "apricot",
+  "nectarine",
+  "plum",
+  "mango",
+  "strawberry",
+  "blueberry",
+  "kiwi",
+  "passionfruit",
+  "raspberry",
+  "watermelon"
+];
+
+export default function App() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  let listToDisplay = fruits;
+
+  const handleChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const renderFruitList = () => {
+    return listToDisplay.map((fruit, i) => <p key={i}>{fruit}</p>);
+  };
+
+  if (searchTerm !== "") {
+    listToDisplay = fruits.filter((fruit) => {
+      return fruit.includes(searchTerm);
+    });
+  }
+
+  const debouncedResults = useMemo(() => {
+    return debouce(handleChange, 300);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Debounce Search Components</h1>
+      <h1>Fruit cart - search</h1>
+      <input type="text" placeholder="search fruits.." onChange={debouncedResults} />
+      {renderFruitList()}
     </div>
   );
 }
-
-export default App;
